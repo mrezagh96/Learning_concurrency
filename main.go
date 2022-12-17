@@ -5,9 +5,9 @@ import (
 	"sync"
 )
 
-var wg sync.WaitGroup
-
 func main() {
+
+	var wg sync.WaitGroup
 
 	function0 := func() {
 		fmt.Println("1- this is a test for Github and git structures checking")
@@ -18,20 +18,20 @@ func main() {
 	go function0()
 	wg.Wait()
 
-	function1()
+	function1(&wg)
 	wg.Wait()
 
 }
 
-func function1() {
-	wg.Add(1)
-	go aaa()
+func function1(Wg *sync.WaitGroup) {
+	Wg.Add(1)
+	go aaa(Wg)
 }
 
-func aaa() {
+func aaa(Wg *sync.WaitGroup) {
 	fmt.Println("3- say hello to everybody ")
 	fmt.Println("4- this is an edit an other device ")
-	wg.Done()
+	Wg.Done()
 }
 
 //package main
