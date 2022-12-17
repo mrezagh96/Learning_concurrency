@@ -6,34 +6,57 @@ import (
 )
 
 func main() {
+	fmt.Println("start")
 
 	var wg sync.WaitGroup
+	testint := 0
 
-	function0 := func() {
-		fmt.Println("1- this is a test for Github and git structures checking")
-		fmt.Println("2- hi here is  mohammadreza")
-		wg.Done()
+	for i := 0; i <= 20000; i++ {
+		wg.Add(1)
+		go increament(&testint, &wg)
 	}
-	wg.Add(1)
-	go function0()
 	wg.Wait()
-
-	function1(&wg)
-	wg.Wait()
-
+	fmt.Println("end")
 }
 
-func function1(Wg *sync.WaitGroup) {
-	Wg.Add(1)
-	go aaa(Wg)
+func increament(pi *int, wg *sync.WaitGroup) {
+	I := *pi
+	fmt.Println(I)
+	*pi++
+	wg.Done()
 }
 
-func aaa(Wg *sync.WaitGroup) {
-	fmt.Println("3- say hello to everybody ")
-	fmt.Println("4- this is an edit an other device ")
-	Wg.Done()
-}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//func main() {
+//
+//	var wg sync.WaitGroup
+//
+//	function0 := func() {
+//		fmt.Println("1- this is a test for Github and git structures checking")
+//		fmt.Println("2- hi here is  mohammadreza")
+//		wg.Done()
+//	}
+//	wg.Add(1)
+//	go function0()
+//	wg.Wait()
+//
+//	function1(&wg)
+//	wg.Wait()
+//
+//}
+//
+//func function1(Wg *sync.WaitGroup) {
+//	Wg.Add(1)
+//	go aaa(Wg)
+//}
+//
+//func aaa(Wg *sync.WaitGroup) {
+//	fmt.Println("3- say hello to everybody ")
+//	fmt.Println("4- this is an edit an other device ")
+//	Wg.Done()
+//}
 
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //package main
 //
 //import (
