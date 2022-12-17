@@ -5,25 +5,31 @@ import (
 	"sync"
 )
 
+type Counter struct {
+	sync.Mutex
+	value int
+}
+
 func main() {
 	fmt.Println("start")
-
 	var wg sync.WaitGroup
-	testint := 0
+	counter := Counter{}
 
-	for i := 0; i <= 20000; i++ {
+	for i := 0; i < 20000; i++ {
 		wg.Add(1)
-		go increament(&testint, &wg)
+		go increament(&wg, &counter)
 	}
 	wg.Wait()
+	fmt.Println(counter.value)
 	fmt.Println("end")
 }
 
-func increament(pi *int, wg *sync.WaitGroup) {
-	I := *pi
-	fmt.Println(I)
-	*pi++
+func increament(wg *sync.WaitGroup, couter *Counter) {
+	couter.Lock()
+	I := couter.value
+	couter.value = I + 1
 	wg.Done()
+	couter.Unlock()
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
