@@ -2,32 +2,29 @@ package main
 
 import (
 	"fmt"
-	"sync"
+	"time"
 )
 
 func main() {
-	var wg sync.WaitGroup
-	ch := make(chan int)
 
-	wg.Add(1)
-	go methode(ch, &wg)
+	ch := make(chan int, 11)
 
-	majicnumber := <-ch
-	wg.Wait()
-	fmt.Println(majicnumber)
+	go Sendmessage(ch)
+
+	for i := range ch {
+		fmt.Println(i)
+	}
 }
-func methode(ch chan int, wg *sync.WaitGroup) {
 
-	ch <- 1111
-	fmt.Println("finish1")
-	fmt.Println("finish2")
-	fmt.Println("finish3")
-	fmt.Println("finish4")
-	fmt.Println("finish5")
-	fmt.Println("finish6")
-	fmt.Println("finish7")
-	fmt.Println("finish8")
-	wg.Done()
+func Sendmessage(ch chan int) {
+	for i := 1; i < 7; i++ {
+		ch <- i
+		time.Sleep(time.Second)
+	}
+	close(ch)
+
+	fmt.Println("End")
+
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
