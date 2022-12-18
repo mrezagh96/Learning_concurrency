@@ -2,17 +2,32 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
 
 func main() {
+	var wg sync.WaitGroup
 	ch := make(chan int)
-	go func() {
-		ch <- 1111
 
-	}()
+	wg.Add(1)
+	go methode(ch, &wg)
+
 	majicnumber := <-ch
+	wg.Wait()
 	fmt.Println(majicnumber)
+}
+func methode(ch chan int, wg *sync.WaitGroup) {
 
+	ch <- 1111
+	fmt.Println("finish1")
+	fmt.Println("finish2")
+	fmt.Println("finish3")
+	fmt.Println("finish4")
+	fmt.Println("finish5")
+	fmt.Println("finish6")
+	fmt.Println("finish7")
+	fmt.Println("finish8")
+	wg.Done()
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
