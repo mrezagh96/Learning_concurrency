@@ -2,35 +2,46 @@ package main
 
 import (
 	"fmt"
-	"sync"
 )
 
-type Counter struct {
-	sync.Mutex
-	value int
-}
-
 func main() {
-	fmt.Println("start")
-	var wg sync.WaitGroup
-	counter := Counter{}
-
-	for i := 0; i < 20000; i++ {
-		wg.Add(1)
-		go increament(&wg, &counter)
-	}
-	wg.Wait()
-	fmt.Println(counter.value)
-	fmt.Println("end")
+	ch := make(chan int)
+	go methode(ch)
+	majicnumber := <-ch
+	fmt.Println(majicnumber)
+}
+func methode(ch chan int) {
+	ch <- 1111
 }
 
-func increament(wg *sync.WaitGroup, couter *Counter) {
-	couter.Lock()
-	I := couter.value
-	couter.value = I + 1
-	wg.Done()
-	couter.Unlock()
-}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// type Counter struct {
+// 	sync.Mutex
+// 	value int
+// }
+//
+// func main() {
+// 	fmt.Println("start")
+//
+// 	var wg sync.WaitGroup
+// 	counter := Counter{}
+//
+// 	for i := 0; i < 20000; i++ {
+// 		wg.Add(1)
+// 		go increament(&counter, &wg)
+// 	}
+// 	wg.Wait()
+// 	fmt.Println(counter.value)
+// 	fmt.Println("end")
+// }
+//
+// func increament(counter *Counter, wg *sync.WaitGroup) {
+// 	counter.Lock()
+// 	I := counter.value
+// 	counter.value = I + 1
+// 	wg.Done()
+// 	counter.Unlock()
+// }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //func main() {
