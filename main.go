@@ -1,120 +1,43 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"log"
+	"net/http"
+	"sync"
 )
 
 func main() {
+	channel := make(chan string, 102)
+	var wg sync.WaitGroup
+	counter := 110
+	// here we can change the number to increase or decrease speed of checking the  Queue
+	//  if we use "1" the Queue will go on with a regular speed , one by one
+	for i := 0; i < counter; i++ {
+		go receiverChannelAndScrollingSites(channel, &wg)
+	}
+	senderChannel(channel, &wg)
+	wg.Wait()
+}
 
-	ch := make(chan int, 11)
-
-	go Sendmessage(ch)
-
-	for i := range ch {
-		fmt.Println(i)
+func senderChannel(channel chan<- string, wg *sync.WaitGroup) {
+	urls := [2]string{"https://www.google.com", "https://www.varzesh3.com"}
+	for i := 0; i < 7; i++ {
+		for _, url := range urls {
+			wg.Add(1)
+			channel <- url
+		}
 	}
 }
 
-func Sendmessage(ch chan int) {
-	for i := 1; i < 7; i++ {
-		ch <- i
-		time.Sleep(time.Second)
+func receiverChannelAndScrollingSites(channel <-chan string, wg *sync.WaitGroup) {
+	for {
+		url := <-channel
+		res, err := http.Get(url)
+		if err != nil {
+			log.Println(err)
+		} else {
+			log.Printf("%s StatusCode : %d", url, res.StatusCode)
+		}
+		wg.Done()
 	}
-	close(ch)
-
-	fmt.Println("End")
-
 }
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// type Counter struct {
-// 	sync.Mutex
-// 	value int
-// }
-//
-// func main() {
-// 	fmt.Println("start")
-//
-// 	var wg sync.WaitGroup
-// 	counter := Counter{}
-//
-// 	for i := 0; i < 20000; i++ {
-// 		wg.Add(1)
-// 		go increament(&counter, &wg)
-// 	}
-// 	wg.Wait()
-// 	fmt.Println(counter.value)
-// 	fmt.Println("end")
-// }
-//
-// func increament(counter *Counter, wg *sync.WaitGroup) {
-// 	counter.Lock()
-// 	I := counter.value
-// 	counter.value = I + 1
-// 	wg.Done()
-// 	counter.Unlock()
-// }
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//func main() {
-//
-//	var wg sync.WaitGroup
-//
-//	function0 := func() {
-//		fmt.Println("1- this is a test for Github and git structures checking")
-//		fmt.Println("2- hi here is  mohammadreza")
-//		wg.Done()
-//	}
-//	wg.Add(1)
-//	go function0()
-//	wg.Wait()
-//
-//	function1(&wg)
-//	wg.Wait()
-//
-//}
-//
-//func function1(Wg *sync.WaitGroup) {
-//	Wg.Add(1)
-//	go aaa(Wg)
-//}
-//
-//func aaa(Wg *sync.WaitGroup) {
-//	fmt.Println("3- say hello to everybody ")
-//	fmt.Println("4- this is an edit an other device ")
-//	Wg.Done()
-//}
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//package main
-//
-//import (
-//	"fmt"
-//	"sync"
-//	"time"
-//)
-//
-//var wg sync.WaitGroup
-//
-//func main() {
-//	fmt.Println("start")
-//	message("Toplearn.com")
-//	wg.Wait()
-//	fmt.Println("End")
-//}
-//
-//func message(text string) {
-//	wg.Add(10)
-//	for i := 1; i <= 10; i++ {
-//		go printMessage(text, i)
-//	}
-//}
-//
-//func printMessage(text string, index int) {
-//	if index == 2 {
-//		time.Sleep(2 * time.Second)
-//	}
-//	fmt.Println(text, index)
-//	wg.Done()
-//}
