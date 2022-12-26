@@ -1,43 +1,47 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"sync"
+	"fmt"
+	"github.com/jzelinskie/geddit"
+	"os"
 )
 
+var redditSession *geddit.LoginSession
+
+type Story struct {
+	title string
+	url   string
+}
+
+func init() {
+	var err error
+	redditSession, err = geddit.NewLoginSession("Nearby-Gene-3146", "njfZMX8keh5wm4z", "gdAgent v0")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(11)
+	}
+
+}
+
 func main() {
-	channel := make(chan string, 102)
-	var wg sync.WaitGroup
-	counter := 110
-	// here we can change the number to increase or decrease speed of checking the  Queue
-	//  if we use "1" the Queue will go on with a regular speed , one by one
-	for i := 0; i < counter; i++ {
-		go receiverChannelAndScrollingSites(channel, &wg)
-	}
-	senderChannel(channel, &wg)
-	wg.Wait()
+	S := loadReddit()
+	fmt.Println(S)
 }
 
-func senderChannel(channel chan<- string, wg *sync.WaitGroup) {
-	urls := [2]string{"https://www.google.com", "https://www.varzesh3.com"}
-	for i := 0; i < 7; i++ {
-		for _, url := range urls {
-			wg.Add(1)
-			channel <- url
-		}
+func loadReddit() []Story {
+	var stories []Story
+	var listoption geddit.ListingOptions
+	submission, err := redditSession.SubredditSubmissions("programming", "", listoption)
+	if err != nil {
+		fmt.Println(err)
+		return nil
 	}
-}
-
-func receiverChannelAndScrollingSites(channel <-chan string, wg *sync.WaitGroup) {
-	for {
-		url := <-channel
-		res, err := http.Get(url)
-		if err != nil {
-			log.Println(err)
-		} else {
-			log.Printf("%s StatusCode : %d", url, res.StatusCode)
+	for _, S := range submission {
+		story := Story{
+			title: S.Title,
+			url:   S.URL,
 		}
-		wg.Done()
+		stories = append(stories, story)
 	}
+	return stories
 }
